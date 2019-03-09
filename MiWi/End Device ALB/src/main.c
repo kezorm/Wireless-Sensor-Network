@@ -270,8 +270,9 @@ int main(void)
 			// indexed at 0 in connection table
 			MiApp_BroadcastPacket(true); // Send Packet to Parent Device
 			delay_ms(50);
+//			LED_Off(LED0);
 			PHY_Sleep();
-			setSleepPeriod(60); // 65 = 16 min
+			setSleepPeriod(1); // 65 = 16 min
 		#endif
 	}
 }

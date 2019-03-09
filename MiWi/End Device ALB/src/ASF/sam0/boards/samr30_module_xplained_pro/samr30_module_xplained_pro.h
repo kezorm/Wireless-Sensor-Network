@@ -76,8 +76,8 @@ void system_board_init(void);
 
 /** \name LED0 definitions
  *  @{ */
-#define LED0_PIN                  PIN_PA14
-#define LED0_ACTIVE               false
+#define LED0_PIN                  PIN_PA27
+#define LED0_ACTIVE               true
 #define LED0_INACTIVE             !LED0_ACTIVE
 /** @} */
 
@@ -398,7 +398,7 @@ void system_board_init(void);
  *
  * \note The pins of the specified LEDs are set to GPIO output mode.
  */
-#define LED_Off(led_gpio)     port_pin_set_output_level(led_gpio,true)
+#define LED_Off(led_gpio)     port_pin_set_output_level(led_gpio,false)
 
 /**
  * \brief Turns on the specified LEDs.
@@ -407,7 +407,7 @@ void system_board_init(void);
  *
  * \note The pins of the specified LEDs are set to GPIO output mode.
  */
-#define LED_On(led_gpio)      port_pin_set_output_level(led_gpio,false)
+#define LED_On(led_gpio)      port_pin_set_output_level(led_gpio,true)
 
 /**
  * \brief Toggles the specified LEDs.
