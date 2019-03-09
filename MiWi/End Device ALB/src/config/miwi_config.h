@@ -106,7 +106,7 @@
 
 // End Device (ED)
 #define ED
-#define NodeID 10
+#define NodeID 22
 
 /*********************************************************************/
 // MY_PAN_ID defines the PAN identifier. Use 0xFFFF if prefer a

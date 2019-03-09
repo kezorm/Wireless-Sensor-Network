@@ -262,7 +262,6 @@ int main(void)
 		}
 		#if defined(ED)
 			MiApp_FlushTx();
-			LED_Toggle(LED0);
 			// Tx Buffer User Data
 			MiApp_WriteData(NodeID);
 			MiApp_WriteData( at30tse_read_temperature()*1.8+32);
@@ -272,7 +271,10 @@ int main(void)
 			delay_ms(50);
 //			LED_Off(LED0);
 			PHY_Sleep();
+			LED_Off(LED0);
 			setSleepPeriod(1); // 65 = 16 min
+			LED_On(LED0);
+            PHY_Wakeup();
 		#endif
 	}
 }

@@ -62,7 +62,7 @@ void system_board_init(void);
  */
 
 /** Name string macro */
-#define BOARD_NAME                "SAMR30_MODULE_XPLAINED_PRO"
+#define BOARD_NAME                "AWESOME_LITTLE_BOARD"
 
 /** \name Resonator definitions
  *  @{ */
@@ -81,22 +81,15 @@ void system_board_init(void);
 #define LED0_INACTIVE             !LED0_ACTIVE
 /** @} */
 
-/** \name LED1 definitions
- *  @{ */
-#define LED1_PIN                  PIN_PA18
-#define LED1_ACTIVE               false
-#define LED1_INACTIVE             !LED1_ACTIVE
-/** @} */
-
 /** \name SW0 definitions
  *  @{ */
-#define SW0_PIN                   PIN_PA07
+#define SW0_PIN                   PIN_PA28
 #define SW0_ACTIVE                false
 #define SW0_INACTIVE              !SW0_ACTIVE
-#define SW0_EIC_PIN               PIN_PA07A_EIC_EXTINT7
-#define SW0_EIC_MUX               MUX_PA07A_EIC_EXTINT7
-#define SW0_EIC_PINMUX            PINMUX_PA07A_EIC_EXTINT7
-#define SW0_EIC_LINE              7
+#define SW0_EIC_PIN               PIN_PA28A_EIC_EXTINT8
+#define SW0_EIC_MUX               MUX_PA28A_EIC_EXTINT8
+#define SW0_EIC_PINMUX            PINMUX_PA28A_EIC_EXTINT8
+#define SW0_EIC_LINE              8
 /** @} */
 
 /**
@@ -106,63 +99,19 @@ void system_board_init(void);
  * boards.
  *
  *  @{ */
-#define LED_0_NAME                "LED0 (yellow)"
+#define LED_0_NAME                "LED0 (red)"
 #define LED_0_PIN                 LED0_PIN
 #define LED_0_ACTIVE              LED0_ACTIVE
 #define LED_0_INACTIVE            LED0_INACTIVE
 #define LED0_GPIO                 LED0_PIN
 #define LED0                      LED0_PIN
 
-#define LED_0_PWM4CTRL_MODULE     TCC0
-#define LED_0_PWM4CTRL_CHANNEL    4
-#define LED_0_PWM4CTRL_OUTPUT     4
-#define LED_0_PWM4CTRL_PIN        PIN_PA14F_TCC0_WO4
-#define LED_0_PWM4CTRL_MUX        MUX_PA14F_TCC0_WO4
-#define LED_0_PWM4CTRL_PINMUX     PINMUX_PA14F_TCC0_WO4
-
-/** @} */
-
-/**
- * \name LED #1 definitions
- *
- * Wrapper macros for LED0, to ensure common naming across all Xplained Pro
- * boards.
- *
- *  @{ */
-#define LED_1_NAME                "LED1 (Green)"
-#define LED_1_PIN                 LED1_PIN
-#define LED_1_ACTIVE              LED1_ACTIVE
-#define LED_1_INACTIVE            LED1_INACTIVE
-#define LED1_GPIO                 LED1_PIN
-#define LED1                      LED1_PIN
-
-#define LED_1_PWM2CTRL_MODULE     TCC0
-#define LED_1_PWM2CTRL_CHANNEL    2
-#define LED_1_PWM2CTRL_OUTPUT     2
-#define LED_1_PWM2CTRL_PIN        PIN_PA18F_TCC0_WO2
-#define LED_1_PWM2CTRL_MUX        MUX_PA18F_TCC0_WO2
-#define LED_1_PWM2CTRL_PINMUX     PINMUX_PA18F_TCC0_WO2
-
 /** @} */
 
 /** Number of on-board LEDs */
-#define LED_COUNT                 2
+#define LED_COUNT                 1
 
 
-/**
- * \name Serial flash definitions
- *
- * On board Serial flash definitions.
- *
- *  @{ */
-#define SERIALFLASH_SPI_MODULE       SERCOM1
-#define SERIALFLASH_SPI_MUX_SETTING  SPI_SIGNAL_MUX_SETTING_E
-#define SERIALFLASH_SPI_PINMUX_PAD0  PINMUX_PA16C_SERCOM1_PAD0
-#define SERIALFLASH_SPI_PINMUX_PAD1  PINMUX_UNUSED
-#define SERIALFLASH_SPI_PINMUX_PAD2  PINMUX_PA18C_SERCOM1_PAD2
-#define SERIALFLASH_SPI_PINMUX_PAD3  PINMUX_PA19C_SERCOM1_PAD3
-#define SERIALFLASH_SPI_CS PIN_PA27
-/** @} */
 
 /**
  * \name Button #0 definitions
@@ -184,46 +133,20 @@ void system_board_init(void);
 /** Number of on-board buttons */
 #define BUTTON_COUNT 1
 
-/** \name Extension header pin definitions
- *  @{
- */
-#define EXT_PIN_3                PIN_PA06
-#define EXT_PIN_4                UNUSED
-#define EXT_PIN_5                PIN_PA14
-#define EXT_PIN_6                UNUSED
-#define EXT_PIN_7                UNUSED
-#define EXT_PIN_8                UNUSED
-#define EXT_PIN_9                PIN_PA06
-#define EXT_PIN_10               PIN_PA28
-#define EXT_PIN_11               PIN_PA08
-#define EXT_PIN_12               PIN_PA09
-#define EXT_PIN_13               PIN_PA14
-#define EXT_PIN_14               PIN_PA15
-#define EXT_PIN_15               PIN_PA17
-#define EXT_PIN_16               PIN_PA18
-#define EXT_PIN_17               PIN_PA16
-#define EXT_PIN_18               PIN_PA19
-/** @} */
-
 /** \name Extension header pin definitions by function
  *  @{
  */
-#define EXT_PIN_ADC_0            EXT_PIN_3
-#define EXT_PIN_ADC_1            EXT_PIN_4
-#define EXT_PIN_GPIO_0           EXT_PIN_5
-#define EXT_PIN_GPIO_1           EXT_PIN_6
-#define EXT_PIN_PWM_0            EXT_PIN_7
-#define EXT_PIN_PWM_1            EXT_PIN_8
-#define EXT_PIN_IRQ              EXT_PIN_9
-#define EXT_PIN_I2C_SDA          EXT_PIN_11
-#define EXT_PIN_I2C_SCL          EXT_PIN_12
-#define EXT_PIN_UART_RX          EXT_PIN_13
-#define EXT_PIN_UART_TX          EXT_PIN_14
-#define EXT_PIN_SPI_SS_1         EXT_PIN_10  
-#define EXT_PIN_SPI_SS_0         EXT_PIN_15  
-#define EXT_PIN_SPI_MOSI         EXT_PIN_16
-#define EXT_PIN_SPI_MISO         EXT_PIN_17
-#define EXT_PIN_SPI_SCK          EXT_PIN_18
+#define EXT_PIN_ADC_0            PIN_PA06
+#define EXT_PIN_PWM_0            PIN_PA24
+#define EXT_PIN_IRQ              PIN_PA07
+#define EXT_PIN_I2C_SDA          PIN_PA08
+#define EXT_PIN_I2C_SCL          PIN_PA09
+#define EXT_PIN_UART_RX          PIN_PA15
+#define EXT_PIN_UART_TX          PIN_PA14
+#define EXT_PIN_SPI_SS_0         PIN_PA17  
+#define EXT_PIN_SPI_MOSI         PIN_PA18
+#define EXT_PIN_SPI_MISO         PIN_PA16
+#define EXT_PIN_SPI_SCK          PIN_PA19
 /** @} */
 
 /** \name Extension header ADC definitions
@@ -239,11 +162,11 @@ void system_board_init(void);
 /** \name Extension header TC definitions
  *  @{
  */
-#define EXT_PWM_MODULE           TC4
+#define EXT_PWM_MODULE           TC1
 #define EXT_PWM_0_CHANNEL        0
-#define EXT_PWM_0_PIN            PIN_PA14E_TC4_WO0
-#define EXT_PWM_0_MUX            MUX_PA14E_TC4_WO0
-#define EXT_PWM_0_PINMUX         PINMUX_PA14E_TC4_WO0
+#define EXT_PWM_0_PIN            PIN_PA24E_TC1_WO0
+#define EXT_PWM_0_MUX            MUX_PA24E_TC1_WO0
+#define EXT_PWM_0_PINMUX         PINMUX_PA24E_TC1_WO0
 /** @} */
 
 
@@ -252,10 +175,10 @@ void system_board_init(void);
  *  @{
  */
 #define EXT_IRQ_MODULE           EIC
-#define EXT_IRQ_INPUT            6
-#define EXT_IRQ_PIN              PIN_PA06A_EIC_EXTINT6
-#define EXT_IRQ_MUX              MUX_PA06A_EIC_EXTINT6
-#define EXT_IRQ_PINMUX           PINMUX_PA06A_EIC_EXTINT6
+#define EXT_IRQ_INPUT            7
+#define EXT_IRQ_PIN              PIN_PA07A_EIC_EXTINT7
+#define EXT_IRQ_MUX              MUX_PA07A_EIC_EXTINT7
+#define EXT_IRQ_PINMUX           PINMUX_PA07A_EIC_EXTINT7
 /** @} */
 
 /** \name Extension header I2C definitions
@@ -284,17 +207,11 @@ void system_board_init(void);
 /** \ Temperature sensor definitions
  *  @{
  */
-#define TEMPERATURE_SENSOR_I2C_MODULE              SERCOM0
-#define TEMPERATURE_ALERT_IRQ_MODULE               EIC
-#define TEMPERATURE_ALERT_IRQ_INPUT                8
-#define TEMPERATURE_ALERT_IRQ_PIN                  PIN_PA28A_EIC_EXTINT8
-#define TEMPERATURE_ALERT_IRQ_MUX                  MUX_PA28A_EIC_EXTINT8
-#define TEMPERATURE_ALERT_IRQ_PINMUX               PINMUX_PA28A_EIC_EXTINT8
+#define TEMPERATURE_SENSOR_I2C_MODULE              EXT_I2C_MODULE
 #define TEMPERATURE_SENSOR_SDA                     EXT_I2C_SERCOM_PINMUX_PAD0
 #define TEMPERATURE_SENSOR_SCL                     EXT_I2C_SERCOM_PINMUX_PAD1
-#define TEMPERATURE_SENSOR_I2C_SERCOM_DMAC_ID_TX   SERCOM0_DMAC_ID_TX
-#define TEMPERATURE_SENSOR_I2C_SERCOM_DMAC_ID_RX   SERCOM0_DMAC_ID_RX
-#define TEMPERATURE_SENSOR_ALERT_PIN               TEMPERATURE_ALERT_IRQ_PINMUX  
+#define TEMPERATURE_SENSOR_I2C_SERCOM_DMAC_ID_TX   EXT_I2C_SERCOM_DMAC_ID_TX
+#define TEMPERATURE_SENSOR_I2C_SERCOM_DMAC_ID_RX   EXT_I2C_SERCOM_DMAC_ID_RX
 /** @} */
 
 /** \name Extension header SPI definitions
@@ -313,14 +230,14 @@ void system_board_init(void);
 /** \name Embedded debugger CDC Gateway USART interface definitions
  * @{
  */
-#define CDC_MODULE              SERCOM3
-#define CDC_SERCOM_MUX_SETTING  USART_RX_3_TX_2_XCK_3
-#define CDC_SERCOM_PINMUX_PAD0  PINMUX_UNUSED
-#define CDC_SERCOM_PINMUX_PAD1  PINMUX_UNUSED
-#define CDC_SERCOM_PINMUX_PAD2  PINMUX_PA24C_SERCOM3_PAD2
-#define CDC_SERCOM_PINMUX_PAD3  PINMUX_PA25C_SERCOM3_PAD3
-#define CDC_SERCOM_DMAC_ID_TX   SERCOM3_DMAC_ID_TX
-#define CDC_SERCOM_DMAC_ID_RX   SERCOM3_DMAC_ID_RX
+#define CDC_MODULE              EXT_UART_MODULE
+#define CDC_SERCOM_MUX_SETTING  EXT_UART_SERCOM_MUX_SETTING
+#define CDC_SERCOM_PINMUX_PAD0  EXT_UART_SERCOM_PINMUX_PAD0
+#define CDC_SERCOM_PINMUX_PAD1  EXT_UART_SERCOM_PINMUX_PAD1
+#define CDC_SERCOM_PINMUX_PAD2  EXT_UART_SERCOM_PINMUX_PAD2
+#define CDC_SERCOM_PINMUX_PAD3  EXT_UART_SERCOM_PINMUX_PAD3
+#define CDC_SERCOM_DMAC_ID_TX   EXT_UART_SERCOM_DMAC_ID_TX
+#define CDC_SERCOM_DMAC_ID_RX   EXT_UART_SERCOM_DMAC_ID_RX
 /** @} */
 
 #define RF_SPI_MODULE              SERCOM4
