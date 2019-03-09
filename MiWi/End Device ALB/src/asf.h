@@ -65,6 +65,11 @@
 // From module: EXTINT - External Interrupt (Callback APIs)
 #include <extint.h>
 #include <extint_callback.h>
+// From module: GFX Monochrome - Monochrome Graphic Library
+#include <gfx_mono.h>
+
+// From module: GFX Monochrome - System Font
+#include <sysfont.h>
 
 // From module: Generic board support
 #include <board.h>
@@ -106,6 +111,9 @@
 // From module: SERCOM USART - Serial Communications (Callback APIs)
 #include <usart.h>
 #include <usart_interrupt.h>
+
+// From module: SSD1306 OLED controller
+#include <ssd1306.h>
 
 // From module: SYSTEM - Clock Management for SAMR30
 #include <clock.h>

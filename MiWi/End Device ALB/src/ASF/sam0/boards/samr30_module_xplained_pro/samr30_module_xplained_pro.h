@@ -138,6 +138,7 @@ void system_board_init(void);
  */
 #define EXT_PIN_ADC_0            PIN_PA06
 #define EXT_PIN_PWM_0            PIN_PA24
+#define EXT_PIN_RESET            PIN_PA25 
 #define EXT_PIN_IRQ              PIN_PA07
 #define EXT_PIN_I2C_SDA          PIN_PA08
 #define EXT_PIN_I2C_SCL          PIN_PA09
