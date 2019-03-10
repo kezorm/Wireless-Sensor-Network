@@ -101,42 +101,9 @@ extern "C" {
 
 //! \name Fundamental Command defines
 //@{
-#define SSD1306_CMD_COL_ADD_SET_LSB(column)         (0x00 | (column))
-#define SSD1306_CMD_COL_ADD_SET_MSB(column)         (0x10 | (column))
-#define SSD1306_CMD_SET_MEMORY_ADDRESSING_MODE      0x20
-#define SSD1306_CMD_SET_COLUMN_ADDRESS              0x21
-#define SSD1306_CMD_SET_PAGE_ADDRESS                0x22
-#define SSD1306_CMD_SET_DISPLAY_START_LINE(line)    (0x40 | (line))
-#define SSD1306_CMD_SET_CONTRAST_CONTROL_FOR_BANK0  0x81
-#define SSD1306_CMD_SET_CHARGE_PUMP_SETTING         0x8D
-#define SSD1306_CMD_SET_SEGMENT_RE_MAP_COL0_SEG0    0xA0
-#define SSD1306_CMD_SET_SEGMENT_RE_MAP_COL127_SEG0  0xA1
-#define SSD1306_CMD_ENTIRE_DISPLAY_AND_GDDRAM_ON    0xA4
-#define SSD1306_CMD_ENTIRE_DISPLAY_ON               0xA5
-#define SSD1306_CMD_SET_NORMAL_DISPLAY              0xA6
-#define SSD1306_CMD_SET_INVERSE_DISPLAY             0xA7
-#define SSD1306_CMD_SET_MULTIPLEX_RATIO             0xA8
-#define SSD1306_CMD_SET_DISPLAY_ON                  0xAF
-#define SSD1306_CMD_SET_DISPLAY_OFF                 0xAE
-#define SSD1306_CMD_SET_PAGE_START_ADDRESS(page)    (0xB0 | (page))
-#define SSD1306_CMD_SET_COM_OUTPUT_SCAN_UP          0xC0
-#define SSD1306_CMD_SET_COM_OUTPUT_SCAN_DOWN        0xC8
-#define SSD1306_CMD_SET_DISPLAY_OFFSET              0xD3
-#define SSD1306_CMD_SET_DISPLAY_CLOCK_DIVIDE_RATIO  0xD5
-#define SSD1306_CMD_SET_PRE_CHARGE_PERIOD           0xD9
-#define SSD1306_CMD_SET_COM_PINS                    0xDA
-#define SSD1306_CMD_SET_VCOMH_DESELECT_LEVEL        0xDB
-#define SSD1306_CMD_NOP                             0xE3
-//@}
-//! \name Graphic Acceleration Command defines
-//@{
-#define SSD1306_CMD_SCROLL_H_RIGHT                  0x26
-#define SSD1306_CMD_SCROLL_H_LEFT                   0x27
-#define SSD1306_CMD_CONTINUOUS_SCROLL_V_AND_H_RIGHT 0x29
-#define SSD1306_CMD_CONTINUOUS_SCROLL_V_AND_H_LEFT  0x2A
-#define SSD1306_CMD_DEACTIVATE_SCROLL               0x2E
-#define SSD1306_CMD_ACTIVATE_SCROLL                 0x2F
-#define SSD1306_CMD_SET_VERTICAL_SCROLL_AREA        0xA3
+#define SSD1306_CMD_CLEAR_SCREEN                    0x04
+#define SSD1306_CMD_UPDATE_DATA                     0x01
+#define SSD1306_CMD_MAINTAIN_SCREEN                 0x00
 //@}
 
 /**
@@ -155,53 +122,14 @@ extern "C" {
 extern struct spi_module ssd1306_master;
 extern struct spi_slave_inst ssd1306_slave;
 
-//! \name OLED controller write and read functions
+//! \name OLED controller functions
 //@{
-void ssd1306_write_command(uint8_t command);
+void ssd1306_clear_screen(void);
 
-void ssd1306_write_data(uint8_t data);
+void ssd1306_write_line(uint8_t line, uint8_t* disp_buffer);
+void ssd1306_write_lines(uint8_t start_line, uint8_t line_count, uint8_t* disp_buffer);
 
-/**
- * \brief Read data from the controller
- *
- * \note The controller does not support read in serial mode.
- *
- * \retval 8 bit data read from the controller
- */
-static inline uint8_t ssd1306_read_data(void)
-{
-	return 0;
-}
-
-/**
- * \brief Read status from the controller
- *
- * \note The controller does not support read in serial mode.
- *
- * \retval 8 bit status read from the controller
- */
-static inline uint8_t ssd1306_get_status(void)
-{
-	return 0;
-}
-//@}
-
-//! \name OLED Controller reset
-//@{
-
-/**
- * \brief Perform a hard reset of the OLED controller
- *
- * This functions will reset the OLED controller by setting the reset pin low.
- */
-static inline void ssd1306_hard_reset(void)
-{
-	uint32_t delay_10us = 10 * (system_gclk_gen_get_hz(0)/1000000);
-	port_pin_set_output_level(SSD1306_RES_PIN, false);
-	delay_cycles(delay_10us); // At lest 10us
-	port_pin_set_output_level(SSD1306_RES_PIN, true);
-	delay_cycles(delay_10us); // At lest 10us
-}
+void ssd1306_maintain_screen(void);
 //@}
 
 //! \name Sleep control
@@ -211,7 +139,8 @@ static inline void ssd1306_hard_reset(void)
  */
 static inline void ssd1306_sleep_enable(void)
 {
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_OFF);
+    // Set the display enable pin to off
+    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
 }
 
 /**
@@ -219,51 +148,8 @@ static inline void ssd1306_sleep_enable(void)
  */
 static inline void ssd1306_sleep_disable(void)
 {
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_ON);
-}
-//@}
-
-//! \name Address setup for the OLED
-//@{
-/**
- * \brief Set current page in display RAM
- *
- * This command is usually followed by the configuration of the column address
- * because this scheme will provide access to all locations in the display
- * RAM.
- *
- * \param address the page address
- */
-static inline void ssd1306_set_page_address(uint8_t address)
-{
-	// Make sure that the address is 4 bits (only 8 pages)
-	address &= 0x0F;
-	ssd1306_write_command(SSD1306_CMD_SET_PAGE_START_ADDRESS(address));
-}
-
-/**
- * \brief Set current column in display RAM
- *
- * \param address the column address
- */
-static inline void ssd1306_set_column_address(uint8_t address)
-{
-	// Make sure the address is 7 bits
-	address &= 0x7F;
-	ssd1306_write_command(SSD1306_CMD_COL_ADD_SET_MSB(address >> 4));
-	ssd1306_write_command(SSD1306_CMD_COL_ADD_SET_LSB(address & 0x0F));
-}
-
-/**
- * \brief Set the display start draw line address
- *
- * This function will set which line should be the start draw line for the OLED.
- */
-static inline void ssd1306_set_display_start_line_address(uint8_t address)
-{
-	// Make sure address is 6 bits
-	address &= 0x3F;
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_START_LINE(address));
+    // Set the display enable pin to on
+    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
 }
 //@}
 
@@ -276,7 +162,13 @@ static inline void ssd1306_set_display_start_line_address(uint8_t address)
  */
 static inline void ssd1306_display_on(void)
 {
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_ON);
+	// Set the power pin to the default state
+	port_pin_set_output_level(SSD1306_POWER_PIN, true);
+
+    // TODO start EXTCOMIN signal
+
+	// Set the display enable pin to the default state
+	port_pin_set_output_level(SSD1306_DISPEN_PIN, true);
 }
 
 /**
@@ -286,45 +178,15 @@ static inline void ssd1306_display_on(void)
  */
 static inline void ssd1306_display_off(void)
 {
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_OFF);
+    // Set the display enable pin to the default state
+    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
+
+    // TODO stop EXTCOMIN signal
+
+	// Set the power pin to the default state
+	port_pin_set_output_level(SSD1306_POWER_PIN, false);
 }
 
-/**
- * \brief Set the OLED contrast level
- *
- * \param contrast a number between 0 and 0xFF
- *
- * \retval contrast the contrast value written to the OLED controller
- */
-static inline uint8_t ssd1306_set_contrast(uint8_t contrast)
-{
-	ssd1306_write_command(SSD1306_CMD_SET_CONTRAST_CONTROL_FOR_BANK0);
-	ssd1306_write_command(contrast);
-	return contrast;
-}
-
-/**
- * \brief Invert all pixels on the device
- *
- * This function will invert all pixels on the OLED
- *
- */
-static inline void ssd1306_display_invert_enable(void)
-{
-	ssd1306_write_command(SSD1306_CMD_SET_INVERSE_DISPLAY);
-}
-
-/**
- * \brief Disable invert of all pixels on the device
- *
- * This function will disable invert on all pixels on the OLED
- *
- */
-static inline void ssd1306_display_invert_disable(void)
-{
-	ssd1306_write_command(SSD1306_CMD_SET_NORMAL_DISPLAY);
-}
-//@}
 
 //! \name Initialization
 //@{

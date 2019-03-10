@@ -62,15 +62,10 @@ void gfx_mono_ssd1306_init(void)
 	uint8_t page;
 	uint8_t column;
 
-#ifdef CONFIG_SSD1306_FRAMEBUFFER
 	gfx_mono_set_framebuffer(framebuffer);
-#endif
 
 	/* Initialize the low-level display controller. */
 	ssd1306_init();
-
-	/* Set display to output data from line 0 */
-	ssd1306_set_display_start_line_address(0);
 
 	/* Clear the contents of the display.
 	 * If using a framebuffer (SPI interface) it will both clear the
@@ -83,7 +78,6 @@ void gfx_mono_ssd1306_init(void)
 	}
 }
 
-#ifdef CONFIG_SSD1306_FRAMEBUFFER
 /**
  * \brief Put framebuffer to LCD controller
  *
@@ -95,17 +89,8 @@ void gfx_mono_ssd1306_init(void)
  */
 void gfx_mono_ssd1306_put_framebuffer(void)
 {
-	uint8_t page;
-
-	for (page = 0; page < GFX_MONO_LCD_PAGES; page++) {
-		ssd1306_set_page_address(page);
-		ssd1306_set_column_address(0);
-		gfx_mono_ssd1306_put_page(framebuffer
-				+ (page * GFX_MONO_LCD_WIDTH), page, 0,
-				GFX_MONO_LCD_WIDTH);
-	}
+    ssd1306_write_lines(0, 128, framebuffer);
 }
-#endif
 
 /**
  * \brief Draw pixel to screen
@@ -219,15 +204,7 @@ uint8_t gfx_mono_ssd1306_get_pixel(gfx_coord_t x, gfx_coord_t y)
 void gfx_mono_ssd1306_put_page(gfx_mono_color_t *data, gfx_coord_t page,
 		gfx_coord_t column, gfx_coord_t width)
 {
-#ifdef CONFIG_SSD1306_FRAMEBUFFER
 	gfx_mono_framebuffer_put_page(data, page, column, width);
-#endif
-	ssd1306_set_page_address(page);
-	ssd1306_set_column_address(column);
-
-	do {
-		ssd1306_write_data(*data++);
-	} while (--width);
 }
 
 /**
@@ -251,17 +228,8 @@ void gfx_mono_ssd1306_put_page(gfx_mono_color_t *data, gfx_coord_t page,
 void gfx_mono_ssd1306_get_page(gfx_mono_color_t *data, gfx_coord_t page,
 		gfx_coord_t column, gfx_coord_t width)
 {
-#ifdef CONFIG_SSD1306_FRAMEBUFFER
 	gfx_mono_framebuffer_get_page(data, page, column, width);
-#else
-	ssd1306_set_page_address(page);
-	ssd1306_set_column_address(column);
-
-	do {
-		*data++ = ssd1306_read_data();
-	} while (--width);
-#endif
-}
+}    
 
 /**
  * \brief Put a byte to the display controller RAM
@@ -284,17 +252,10 @@ void gfx_mono_ssd1306_get_page(gfx_mono_color_t *data, gfx_coord_t page,
  void gfx_mono_ssd1306_put_byte(gfx_coord_t page, gfx_coord_t column,
 		uint8_t data, bool force)
 {
-#ifdef CONFIG_SSD1306_FRAMEBUFFER
 	if (!force && data == gfx_mono_framebuffer_get_byte(page, column)) {
 		return;
 	}
 	gfx_mono_framebuffer_put_byte(page, column, data);
-#endif
-
-	ssd1306_set_page_address(page);
-	ssd1306_set_column_address(column);
-
-	ssd1306_write_data(data);
 }
 
 /**
@@ -316,16 +277,7 @@ void gfx_mono_ssd1306_get_page(gfx_mono_color_t *data, gfx_coord_t page,
  */
 uint8_t gfx_mono_ssd1306_get_byte(gfx_coord_t page, gfx_coord_t column)
 {
-#ifdef CONFIG_SSD1306_FRAMEBUFFER
 	return gfx_mono_framebuffer_get_byte(page, column);
-
-#else
-	ssd1306_set_page_address(page);
-	ssd1306_set_column_address(column);
-
-	return ssd1306_read_data();
-
-#endif
 }
 
 /**

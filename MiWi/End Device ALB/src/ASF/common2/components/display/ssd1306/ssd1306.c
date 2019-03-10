@@ -48,6 +48,24 @@
 struct spi_module ssd1306_master;
 struct spi_slave_inst ssd1306_slave;
 
+static uint32_t delay_10uS;
+
+static void assert_chip_select(void)
+{
+    // Assert the chip select pin (spi driver assumes negative logic)
+    spi_select_slave(&ssd1306_master, &ssd1306_slave, false);
+
+    delay_cycles(delay_10uS); // At lest 10us    
+}
+
+static void deassert_chip_select(void)
+{
+    delay_cycles(delay_10uS); // At lest 10us
+
+    // Assert the chip select pin (spi driver assumes negative logic)
+    spi_select_slave(&ssd1306_master, &ssd1306_slave, true);
+}
+
 /**
  * \internal
  * \brief Initialize the hardware interface
@@ -72,6 +90,7 @@ static void ssd1306_interface_init(void)
 	config.pinmux_pad2 = SSD1306_SPI_PINMUX_PAD2;
 	config.pinmux_pad3 = SSD1306_SPI_PINMUX_PAD3;
 	config.mode_specific.master.baudrate = SSD1306_CLOCK_SPEED;
+    config.data_order  = SPI_DATA_ORDER_LSB;
 
 	spi_init(&ssd1306_master, SSD1306_SPI, &config);
 	spi_enable(&ssd1306_master);
@@ -80,8 +99,9 @@ static void ssd1306_interface_init(void)
 	port_get_config_defaults(&pin);
 	pin.direction = PORT_PIN_DIR_OUTPUT;
 
-	port_pin_set_config(SSD1306_DC_PIN, &pin);
-	port_pin_set_config(SSD1306_RES_PIN, &pin);
+	port_pin_set_config(SSD1306_CS_PIN, &pin);
+	port_pin_set_config(SSD1306_POWER_PIN, &pin);
+	port_pin_set_config(SSD1306_DISPEN_PIN, &pin);
 }
 
 /**
@@ -96,90 +116,101 @@ void ssd1306_init(void)
 	// Initialize delay routine
 	delay_init();
 
+    delay_10uS = 10 * (system_gclk_gen_get_hz(0)/1000000);
+
 	// Initialize the interface
 	ssd1306_interface_init();
 
-	// Do a hard reset of the OLED display controller
-	ssd1306_hard_reset();
+	// Set the chip select pin to the default state (spi driver assumes negative logic)
+	spi_select_slave(&ssd1306_master, &ssd1306_slave, true);
 
-	// Set the reset pin to the default state
-	port_pin_set_output_level(SSD1306_RES_PIN, true);
+	// Set the display enable pin to the default state
+	port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
 
-	// 1/32 Duty (0x0F~0x3F)
-	ssd1306_write_command(SSD1306_CMD_SET_MULTIPLEX_RATIO);
-	ssd1306_write_command(0x1F);
-
-	// Shift Mapping RAM Counter (0x00~0x3F)
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_OFFSET);
-	ssd1306_write_command(0x00);
-
-	// Set Mapping RAM Display Start Line (0x00~0x3F)
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_START_LINE(0x00));
-
-	// Set Column Address 0 Mapped to SEG0
-	ssd1306_write_command(SSD1306_CMD_SET_SEGMENT_RE_MAP_COL127_SEG0);
-
-	// Set COM/Row Scan Scan from COM63 to 0
-	ssd1306_write_command(SSD1306_CMD_SET_COM_OUTPUT_SCAN_DOWN);
-
-	// Set COM Pins hardware configuration
-	ssd1306_write_command(SSD1306_CMD_SET_COM_PINS);
-	ssd1306_write_command(0x02);
-
-	ssd1306_set_contrast(0x8F);
-
-	// Disable Entire display On
-	ssd1306_write_command(SSD1306_CMD_ENTIRE_DISPLAY_AND_GDDRAM_ON);
-
-	ssd1306_display_invert_disable();
-
-	// Set Display Clock Divide Ratio / Oscillator Frequency (Default => 0x80)
-	ssd1306_write_command(SSD1306_CMD_SET_DISPLAY_CLOCK_DIVIDE_RATIO);
-	ssd1306_write_command(0x80);
-
-	// Enable charge pump regulator
-	ssd1306_write_command(SSD1306_CMD_SET_CHARGE_PUMP_SETTING);
-	ssd1306_write_command(0x14);
-
-	// Set VCOMH Deselect Level
-	ssd1306_write_command(SSD1306_CMD_SET_VCOMH_DESELECT_LEVEL);
-	ssd1306_write_command(0x40); // Default => 0x20 (0.77*VCC)
-
-	// Set Pre-Charge as 15 Clocks & Discharge as 1 Clock
-	ssd1306_write_command(SSD1306_CMD_SET_PRE_CHARGE_PERIOD);
-	ssd1306_write_command(0xF1);
+	// Set the power pin to the default state
+	port_pin_set_output_level(SSD1306_POWER_PIN, false);
 
 	ssd1306_display_on();
+
+	// Do a hard reset of the OLED display controller
+	ssd1306_clear_screen();
 }
 
-/**
- * \brief Writes a command to the display controller
- *
- * This functions pull pin D/C# low before writing to the controller. Different
- * data write function is called based on the selected interface.
- *
- * \param command the command to write
- */
-void ssd1306_write_command(uint8_t command)
+void ssd1306_clear_screen(void)
 {
-	spi_select_slave(&ssd1306_master, &ssd1306_slave, true);
-	port_pin_set_output_level(SSD1306_DC_PIN, false);
-	spi_write_buffer_wait(&ssd1306_master, &command, 1);
-	spi_select_slave(&ssd1306_master, &ssd1306_slave, false);
+    assert_chip_select();
+
+    while(!spi_is_ready_to_write(&ssd1306_master));
+	spi_write(&ssd1306_master, SSD1306_CMD_CLEAR_SCREEN);
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+
+    deassert_chip_select();
 }
 
-/**
- * \brief Write data to the display controller
- *
- * This functions sets the pin D/C# before writing to the controller. Different
- * data write function is called based on the selected interface.
- *
- * \param data the data to write
- */
-void ssd1306_write_data(uint8_t data)
+void ssd1306_write_line(uint8_t line, uint8_t* disp_buffer)
 {
-	spi_select_slave(&ssd1306_master, &ssd1306_slave, true);
-	port_pin_set_output_level(SSD1306_DC_PIN, true);
-	spi_write_buffer_wait(&ssd1306_master, &data, 1);
-	spi_select_slave(&ssd1306_master, &ssd1306_slave, false);
+    disp_buffer += (16*line);
+    line++;     // LCD line addesses are 1-indexed;
+    
+    assert_chip_select();
+
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, SSD1306_CMD_UPDATE_DATA);
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, line);
+    for(uint8_t i=0; i<16; i++)
+    {
+        while(!spi_is_ready_to_write(&ssd1306_master));
+        spi_write(&ssd1306_master, *disp_buffer++);
+    }
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+
+    deassert_chip_select();
+}
+
+void ssd1306_write_lines(uint8_t start_line, uint8_t line_count, uint8_t* disp_buffer)
+{
+    disp_buffer += (16*start_line);
+    start_line++;     // LCD line addesses are 1-indexed;
+
+    assert_chip_select();
+
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, SSD1306_CMD_UPDATE_DATA);
+    for( ; line_count > 0; line_count--, start_line++ )
+    {
+        while(!spi_is_ready_to_write(&ssd1306_master));
+        spi_write(&ssd1306_master, start_line);
+        for(uint8_t i=0; i<16; i++)
+        {
+            while(!spi_is_ready_to_write(&ssd1306_master));
+            spi_write(&ssd1306_master, *disp_buffer++);
+        }
+        while(!spi_is_ready_to_write(&ssd1306_master));
+        spi_write(&ssd1306_master, 0);        
+    }    
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+
+    deassert_chip_select();
+}
+
+void ssd1306_maintain_screen(void)
+{
+    assert_chip_select();
+
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, SSD1306_CMD_MAINTAIN_SCREEN);
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+    while(!spi_is_ready_to_write(&ssd1306_master));
+    spi_write(&ssd1306_master, 0);
+
+    deassert_chip_select();
 }

@@ -191,6 +191,9 @@ int main(void)
 	// RTC Init for wake up from Backup Sleep Mode
 	rtc_init();
 
+    gfx_mono_init();
+     gfx_mono_put_framebuffer();
+
 	/*******************************************************************/
 	// Initialize Microchip proprietary protocol. Which protocol to use
 	// depends on the configuration in ConfigApp.h

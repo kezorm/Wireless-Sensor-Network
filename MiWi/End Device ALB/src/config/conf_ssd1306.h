@@ -48,35 +48,25 @@
 
 #include <board.h>
 
-#ifdef EXT3_SPI_MODULE
 /* Interface configuration for SAM Xplained Pro */
-#  define SSD1306_SPI                 EXT3_SPI_MODULE
-#  define CONFIG_SSD1306_FRAMEBUFFER
+#define SSD1306_SPI                   EXT_SPI_MODULE
+#define CONFIG_SSD1306_FRAMEBUFFER
 
-#  define SSD1306_DC_PIN              EXT3_PIN_5
-#  define SSD1306_RES_PIN             EXT3_PIN_10
-#  define SSD1306_CS_PIN              EXT3_PIN_15
+#define SSD1306_POWER_PIN             EXT_PIN_RESET
+#define SSD1306_DISPEN_PIN            EXT_PIN_SPI_MISO
+#define SSD1306_CS_PIN                EXT_PIN_SPI_SS_0
 
-#  define SSD1306_SPI_PINMUX_SETTING  EXT3_SPI_SERCOM_MUX_SETTING
-#  define SSD1306_SPI_PINMUX_PAD0     EXT3_SPI_SERCOM_PINMUX_PAD0
-#  define SSD1306_SPI_PINMUX_PAD1     PINMUX_UNUSED
-#  define SSD1306_SPI_PINMUX_PAD2     EXT3_SPI_SERCOM_PINMUX_PAD2
-#  define SSD1306_SPI_PINMUX_PAD3     EXT3_SPI_SERCOM_PINMUX_PAD3
-#else
-/* Dummy Interface configuration */
-#  define SSD1306_SPI                 0
-#  define CONFIG_SSD1306_FRAMEBUFFER
+#define SSD1306_SPI_PINMUX_SETTING    EXT_SPI_SERCOM_MUX_SETTING
+#define SSD1306_SPI_PINMUX_PAD0       PINMUX_UNUSED
+#define SSD1306_SPI_PINMUX_PAD1       PINMUX_UNUSED
+#define SSD1306_SPI_PINMUX_PAD2       EXT_SPI_SERCOM_PINMUX_PAD2
+#define SSD1306_SPI_PINMUX_PAD3       EXT_SPI_SERCOM_PINMUX_PAD3
 
-#  define SSD1306_DC_PIN              0
-#  define SSD1306_RES_PIN             0
-#  define SSD1306_CS_PIN              0
-
-#  define SSD1306_SPI_PINMUX_SETTING  0
-#  define SSD1306_SPI_PINMUX_PAD0     0
-#  define SSD1306_SPI_PINMUX_PAD1     0
-#  define SSD1306_SPI_PINMUX_PAD2     0
-#  define SSD1306_SPI_PINMUX_PAD3     0
-#endif
+#define SSD1306_EXTCOM_MODULE         EXT_PWM_MODULE
+#define SSD1306_EXTCOM_CHANNEL        EXT_PWM_0_CHANNEL
+#define SSD1306_EXTCOM_PIN            EXT_PWM_0_PIN
+#define SSD1306_EXTCOM_MUX            EXT_PWM_0_MUX
+#define SSD1306_EXTCOM_PINMUX         EXT_PWM_0_PINMUX
 
 /* Minimum clock period is 50ns@3.3V -> max frequency is 20MHz */
 #define SSD1306_CLOCK_SPEED           1000000UL
