@@ -192,8 +192,9 @@ int main(void)
 	rtc_init();
 
     gfx_mono_init();
-     gfx_mono_put_framebuffer();
 
+    gfx_mono_generic_draw_filled_circle( 64, 64, 40, GFX_PIXEL_SET, GFX_WHOLE);
+    
 	/*******************************************************************/
 	// Initialize Microchip proprietary protocol. Which protocol to use
 	// depends on the configuration in ConfigApp.h
@@ -272,11 +273,15 @@ int main(void)
 			// indexed at 0 in connection table
 			MiApp_BroadcastPacket(true); // Send Packet to Parent Device
 			delay_ms(50);
-//			LED_Off(LED0);
+
+            gfx_mono_put_framebuffer();
+
 			PHY_Sleep();
+//            ssd1306_display_off();
 			LED_Off(LED0);
 			setSleepPeriod(1); // 65 = 16 min
 			LED_On(LED0);
+//            ssd1306_display_on();
             PHY_Wakeup();
 		#endif
 	}

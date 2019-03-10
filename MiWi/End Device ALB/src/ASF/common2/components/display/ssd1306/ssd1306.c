@@ -48,6 +48,8 @@
 struct spi_module ssd1306_master;
 struct spi_slave_inst ssd1306_slave;
 
+struct tc_module extcom_tc_instance;
+
 static uint32_t delay_10uS;
 
 static void assert_chip_select(void)
@@ -102,6 +104,31 @@ static void ssd1306_interface_init(void)
 	port_pin_set_config(SSD1306_CS_PIN, &pin);
 	port_pin_set_config(SSD1306_POWER_PIN, &pin);
 	port_pin_set_config(SSD1306_DISPEN_PIN, &pin);
+    
+    struct tc_config config_tc;
+
+    tc_reset(&extcom_tc_instance);
+    tc_get_config_defaults(&config_tc);
+
+    config_tc.counter_size = TC_COUNTER_SIZE_16BIT;
+    config_tc.clock_source = GCLK_GENERATOR_1;
+    config_tc.clock_prescaler = TC_CLOCK_PRESCALER_DIV1;
+
+    config_tc.wave_generation = TC_WAVE_GENERATION_MATCH_FREQ;
+    
+    config_tc.counter_16_bit.compare_capture_channel[SSD1306_EXTCOM_CHANNEL] = 0xE3;
+
+    config_tc.pwm_channel[SSD1306_EXTCOM_CHANNEL].enabled = true;
+    config_tc.pwm_channel[SSD1306_EXTCOM_CHANNEL].pin_out = SSD1306_EXTCOM_PIN;
+    config_tc.pwm_channel[SSD1306_EXTCOM_CHANNEL].pin_mux = SSD1306_EXTCOM_PINMUX;
+        
+    tc_init(&extcom_tc_instance, SSD1306_EXTCOM_MODULE, &config_tc);
+
+    tc_enable(&extcom_tc_instance);
+
+    tc_set_count_value(&extcom_tc_instance, 0);
+        
+    tc_start_counter(&extcom_tc_instance);
 }
 
 /**
@@ -164,7 +191,7 @@ void ssd1306_write_line(uint8_t line, uint8_t* disp_buffer)
     for(uint8_t i=0; i<16; i++)
     {
         while(!spi_is_ready_to_write(&ssd1306_master));
-        spi_write(&ssd1306_master, *disp_buffer++);
+        spi_write(&ssd1306_master, ~(*(disp_buffer++)));
     }
     while(!spi_is_ready_to_write(&ssd1306_master));
     spi_write(&ssd1306_master, 0);
@@ -190,7 +217,7 @@ void ssd1306_write_lines(uint8_t start_line, uint8_t line_count, uint8_t* disp_b
         for(uint8_t i=0; i<16; i++)
         {
             while(!spi_is_ready_to_write(&ssd1306_master));
-            spi_write(&ssd1306_master, *disp_buffer++);
+            spi_write(&ssd1306_master, ~(*(disp_buffer++)));
         }
         while(!spi_is_ready_to_write(&ssd1306_master));
         spi_write(&ssd1306_master, 0);        
@@ -213,4 +240,39 @@ void ssd1306_maintain_screen(void)
     spi_write(&ssd1306_master, 0);
 
     deassert_chip_select();
+}
+
+
+//! \name Display hardware control
+//@{
+/**
+ * \brief Turn the OLED display on
+ *
+ * This function will turn on the OLED.
+ */
+void ssd1306_display_on(void)
+{
+	// Set the power pin to the default state
+	port_pin_set_output_level(SSD1306_POWER_PIN, true);
+
+    tc_start_counter(&extcom_tc_instance);
+
+	// Set the display enable pin to the default state
+	port_pin_set_output_level(SSD1306_DISPEN_PIN, true);
+}
+
+/**
+ * \brief Turn the OLED display off
+ *
+ * This function will turn off the OLED.
+ */
+void ssd1306_display_off(void)
+{
+    // Set the display enable pin to the default state
+    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
+
+    tc_stop_counter(&extcom_tc_instance);
+
+	// Set the power pin to the default state
+	port_pin_set_output_level(SSD1306_POWER_PIN, false);
 }

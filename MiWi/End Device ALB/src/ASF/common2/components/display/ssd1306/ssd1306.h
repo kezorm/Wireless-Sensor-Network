@@ -50,6 +50,7 @@
 #include <port.h>
 #include <spi.h>
 #include <delay.h>
+#include <tc.h>
 
 // controller and OLED configuration file
 #include "conf_ssd1306.h"
@@ -160,32 +161,14 @@ static inline void ssd1306_sleep_disable(void)
  *
  * This function will turn on the OLED.
  */
-static inline void ssd1306_display_on(void)
-{
-	// Set the power pin to the default state
-	port_pin_set_output_level(SSD1306_POWER_PIN, true);
-
-    // TODO start EXTCOMIN signal
-
-	// Set the display enable pin to the default state
-	port_pin_set_output_level(SSD1306_DISPEN_PIN, true);
-}
+void ssd1306_display_on(void);
 
 /**
  * \brief Turn the OLED display off
  *
  * This function will turn off the OLED.
  */
-static inline void ssd1306_display_off(void)
-{
-    // Set the display enable pin to the default state
-    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
-
-    // TODO stop EXTCOMIN signal
-
-	// Set the power pin to the default state
-	port_pin_set_output_level(SSD1306_POWER_PIN, false);
-}
+void ssd1306_display_off(void);
 
 
 //! \name Initialization
