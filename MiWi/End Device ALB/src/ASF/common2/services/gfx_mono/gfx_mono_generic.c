@@ -66,50 +66,45 @@
 void gfx_mono_generic_draw_horizontal_line(gfx_coord_t x, gfx_coord_t y,
 		gfx_coord_t length, enum gfx_mono_color color)
 {
-	uint8_t page;
-	uint8_t pixelmask;
-	uint8_t temp;
-
-	/* Clip line length if too long */
-	if (x + length > GFX_MONO_LCD_WIDTH) {
-		length = GFX_MONO_LCD_WIDTH - x;
-	}
-
-	page = y / 8;
-	pixelmask = (1 << (y - (page * 8)));
-
 	if (length == 0) {
-		/* Nothing to do. Move along. */
 		return;
 	}
 
-	switch (color) {
-	case GFX_PIXEL_SET:
-		while (length-- > 0) {
-			temp = gfx_mono_get_byte(page, x + length);
-			temp |= pixelmask;
-			gfx_mono_put_byte(page, x + length, temp);
-		}
-		break;
+	gfx_coord_t x2 = x + length - 1;
 
-	case GFX_PIXEL_CLR:
-		while (length-- > 0) {
-			temp = gfx_mono_get_byte(page, x + length);
-			temp &= ~pixelmask;
-			gfx_mono_put_byte(page, x + length, temp);
-		}
-		break;
+	if (x == x2) {
+		gfx_mono_draw_pixel(x, y, color);
+		return;
+	}
 
-	case GFX_PIXEL_XOR:
-		while (length-- > 0) {
-			temp = gfx_mono_get_byte(page, x + length);
-			temp ^= pixelmask;
-			gfx_mono_put_byte(page, x + length, temp);
-		}
-		break;
+	if (x2 >= GFX_MONO_LCD_WIDTH - 1) {
+		x2 = GFX_MONO_LCD_WIDTH - 1;
+	}
 
-	default:
-		break;
+	gfx_coord_t x1byte = x / 8;
+	gfx_coord_t x2byte = x2 / 8;
+
+	uint8_t x1bitpos = x & 0x07;
+	uint8_t x2bitpos = x2 & 0x07;
+
+	uint8_t x1pixelmask = 0xFF << x1bitpos;
+	uint8_t x2pixelmask = 0xFF >> (7 - x2bitpos);
+
+	/* The pixels are in the same byte; combine masks */
+	if (x1byte == x2byte) {
+		uint8_t pixelmask = x1pixelmask & x2pixelmask;
+		gfx_mono_mask_byte(x, y, pixelmask, color);
+	} else {
+		gfx_mono_mask_byte(x, y, x1pixelmask, color);
+
+		x1byte = (x1byte * 8) + 8;
+		x2byte = (x2byte * 8);
+		while (x1byte < x2byte) {
+			gfx_mono_mask_byte(x1byte, y, 0xFF, color);
+			x1byte += 8;
+		}
+
+		gfx_mono_mask_byte(x2, x, x2pixelmask, color);
 	}
 }
 
@@ -133,38 +128,43 @@ void gfx_mono_generic_draw_vertical_line(gfx_coord_t x, gfx_coord_t y,
 		return;
 	}
 
-	gfx_coord_t y2 = y + length - 1;
+	uint8_t pixelmask;
+	uint8_t temp;
 
-	if (y == y2) {
-		gfx_mono_draw_pixel(x, y, color);
-		return;
+	/* Clip line length if too long */
+	if (y + length > GFX_MONO_LCD_HEIGHT) {
+		length = GFX_MONO_LCD_HEIGHT - y;
 	}
 
-	if (y2 >= GFX_MONO_LCD_HEIGHT - 1) {
-		y2 = GFX_MONO_LCD_HEIGHT - 1;
-	}
+	pixelmask = (1 << (x & 0x7));
 
-	gfx_coord_t y1page = y / 8;
-	gfx_coord_t y2page = y2 / 8;
-
-	uint8_t y1bitpos = y & 0x07;
-	uint8_t y2bitpos = y2 & 0x07;
-
-	uint8_t y1pixelmask = 0xFF << y1bitpos;
-	uint8_t y2pixelmask = 0xFF >> (7 - y2bitpos);
-
-	/* The pixels are on the same page; combine masks */
-	if (y1page == y2page) {
-		uint8_t pixelmask = y1pixelmask & y2pixelmask;
-		gfx_mono_mask_byte(y1page, x, pixelmask, color);
-	} else {
-		gfx_mono_mask_byte(y1page, x, y1pixelmask, color);
-
-		while (++y1page < y2page) {
-			gfx_mono_mask_byte(y1page, x, 0xFF, color);
+	switch (color) {
+	case GFX_PIXEL_SET:
+		while (length-- > 0) {
+			temp = gfx_mono_get_byte(x, y + length);
+			temp |= pixelmask;
+			gfx_mono_put_byte(x, y + length, temp);
 		}
+		break;
 
-		gfx_mono_mask_byte(y2page, x, y2pixelmask, color);
+	case GFX_PIXEL_CLR:
+		while (length-- > 0) {
+			temp = gfx_mono_get_byte(x, y + length);
+			temp &= ~pixelmask;
+			gfx_mono_put_byte(x, y + length, temp);
+		}
+		break;
+
+	case GFX_PIXEL_XOR:
+		while (length-- > 0) {
+			temp = gfx_mono_get_byte(x, y + length);
+			temp ^= pixelmask;
+			gfx_mono_put_byte(x, y + length, temp);
+		}
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -480,22 +480,22 @@ void gfx_mono_generic_put_bitmap(struct gfx_mono_bitmap *bitmap, gfx_coord_t x,
 
 	switch (bitmap->type) {
 	case GFX_MONO_BITMAP_PROGMEM:
-		for (i = 0; i < num_pages; i++) {
-			for (column = 0; column < bitmap->width; column++) {
-				temp = PROGMEM_READ_BYTE(bitmap->data.progmem
-						+ (i * bitmap->width)
-						+ column);
-				gfx_mono_put_byte(i + page, column + x, temp);
-			}
-		}
+		//for (i = 0; i < num_pages; i++) {
+			//for (column = 0; column < bitmap->width; column++) {
+				//temp = PROGMEM_READ_BYTE(bitmap->data.progmem
+						//+ (i * bitmap->width)
+						//+ column);
+				//gfx_mono_put_byte(i + page, column + x, temp);
+			//}
+		//}
 		break;
 
 	case GFX_MONO_BITMAP_RAM:
-		for (i = 0; i < num_pages; i++) {
-			gfx_mono_put_page(bitmap->data.pixmap
-					+ (i * bitmap->width), page + i, x,
-					bitmap->width);
-		}
+		//for (i = 0; i < num_pages; i++) {
+			//gfx_mono_put_page(bitmap->data.pixmap
+					//+ (i * bitmap->width), page + i, x,
+					//bitmap->width);
+		//}
 		break;
 
 	default:

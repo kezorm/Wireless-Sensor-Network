@@ -100,13 +100,6 @@ extern "C" {
  * @{
  */
 
-//! \name Fundamental Command defines
-//@{
-#define SSD1306_CMD_CLEAR_SCREEN                    0x04
-#define SSD1306_CMD_UPDATE_DATA                     0x01
-#define SSD1306_CMD_MAINTAIN_SCREEN                 0x00
-//@}
-
 /**
  * \name Interface selection
  *
@@ -131,27 +124,6 @@ void ssd1306_write_line(uint8_t line, uint8_t* disp_buffer);
 void ssd1306_write_lines(uint8_t start_line, uint8_t line_count, uint8_t* disp_buffer);
 
 void ssd1306_maintain_screen(void);
-//@}
-
-//! \name Sleep control
-//@{
-/**
- * \brief Enable the OLED sleep mode
- */
-static inline void ssd1306_sleep_enable(void)
-{
-    // Set the display enable pin to off
-    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
-}
-
-/**
- * \brief Disable the OLED sleep mode
- */
-static inline void ssd1306_sleep_disable(void)
-{
-    // Set the display enable pin to on
-    port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
-}
 //@}
 
 //! \name Display hardware control

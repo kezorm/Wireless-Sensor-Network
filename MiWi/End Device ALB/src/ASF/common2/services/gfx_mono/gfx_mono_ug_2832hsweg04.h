@@ -73,11 +73,10 @@ extern "C" {
  */
 
 #define GFX_MONO_LCD_WIDTH              128
-#ifndef GFX_MONO_LCD_HEIGHT
-#       define GFX_MONO_LCD_HEIGHT             128
-#endif
+#define GFX_MONO_LCD_HEIGHT             128
+
 #define GFX_MONO_LCD_PIXELS_PER_BYTE    8
-#define GFX_MONO_LCD_PAGES              (GFX_MONO_LCD_HEIGHT / \
+#define GFX_MONO_LCD_BYTES_PER_ROW      (GFX_MONO_LCD_WIDTH / \
 	GFX_MONO_LCD_PIXELS_PER_BYTE)
 #define GFX_MONO_LCD_FRAMEBUFFER_SIZE   ((GFX_MONO_LCD_WIDTH * \
 	GFX_MONO_LCD_HEIGHT) / GFX_MONO_LCD_PIXELS_PER_BYTE)
@@ -110,54 +109,29 @@ extern "C" {
 	gfx_mono_generic_put_bitmap(bitmap, x, y)
 
 #define gfx_mono_draw_pixel(x, y, color) \
-	gfx_mono_ssd1306_draw_pixel(x, y, color)
+	gfx_mono_framebuffer_draw_pixel(x, y, color)
 
 #define gfx_mono_get_pixel(x, y) \
-	gfx_mono_ssd1306_get_pixel(x, y)
+	gfx_mono_framebuffer_get_pixel(x, y)
 
 #define gfx_mono_init()	\
 	gfx_mono_ssd1306_init()
 
-#define gfx_mono_put_page(data, page, column, width) \
-	gfx_mono_ssd1306_put_page(data, page, column, width)
+#define gfx_mono_put_byte(x, y, data) \
+	gfx_mono_framebuffer_put_byte(x, y, data)
 
-#define gfx_mono_get_page(data, page, column, width) \
-	gfx_mono_ssd1306_get_page(data, page, column, width)
+#define gfx_mono_get_byte(x, y)	\
+	gfx_mono_framebuffer_get_byte(x, y)
 
-#define gfx_mono_put_byte(page, column, data) \
-	gfx_mono_ssd1306_put_byte(page, column, data, false)
-
-#define gfx_mono_get_byte(page, column)	\
-	gfx_mono_ssd1306_get_byte(page, column)
-
-#define gfx_mono_mask_byte(page, column, pixel_mask, color) \
-	gfx_mono_ssd1306_mask_byte(page, column, pixel_mask, color)
+#define gfx_mono_mask_byte(x, y, pixel_mask, color) \
+	gfx_mono_framebuffer_mask_byte(x, y, pixel_mask, color)
 
 #define gfx_mono_put_framebuffer() \
 	gfx_mono_ssd1306_put_framebuffer()
 
 void gfx_mono_ssd1306_put_framebuffer(void);
 
-void gfx_mono_ssd1306_put_page(gfx_mono_color_t *data, gfx_coord_t page,
-		gfx_coord_t page_offset, gfx_coord_t width);
-
-void gfx_mono_ssd1306_get_page(gfx_mono_color_t *data, gfx_coord_t page,
-		gfx_coord_t page_offset, gfx_coord_t width);
-
 void gfx_mono_ssd1306_init(void);
-
-void gfx_mono_ssd1306_draw_pixel(gfx_coord_t x, gfx_coord_t y,
-		gfx_mono_color_t color);
-
-uint8_t gfx_mono_ssd1306_get_pixel(gfx_coord_t x, gfx_coord_t y);
-
-void gfx_mono_ssd1306_put_byte(gfx_coord_t page, gfx_coord_t column,
-		uint8_t data, bool force);
-
-uint8_t gfx_mono_ssd1306_get_byte(gfx_coord_t page, gfx_coord_t column);
-
-void gfx_mono_ssd1306_mask_byte(gfx_coord_t page, gfx_coord_t column,
-		gfx_mono_color_t pixel_mask, gfx_mono_color_t color);
 
 /** @} */
 

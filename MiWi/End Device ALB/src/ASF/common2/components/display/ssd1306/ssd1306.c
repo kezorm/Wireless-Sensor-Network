@@ -51,6 +51,15 @@ struct spi_slave_inst ssd1306_slave;
 struct tc_module extcom_tc_instance;
 
 static uint32_t delay_10uS;
+static uint32_t delay_50uS;
+
+//! \name Fundamental Command defines
+//@{
+#define SSD1306_CMD_CLEAR_SCREEN                    0x04
+#define SSD1306_CMD_UPDATE_DATA                     0x01
+#define SSD1306_CMD_MAINTAIN_SCREEN                 0x00
+//@}
+
 
 static void assert_chip_select(void)
 {
@@ -127,8 +136,6 @@ static void ssd1306_interface_init(void)
     tc_enable(&extcom_tc_instance);
 
     tc_set_count_value(&extcom_tc_instance, 0);
-        
-    tc_start_counter(&extcom_tc_instance);
 }
 
 /**
@@ -144,6 +151,7 @@ void ssd1306_init(void)
 	delay_init();
 
     delay_10uS = 10 * (system_gclk_gen_get_hz(0)/1000000);
+    delay_50uS = 50 * (system_gclk_gen_get_hz(0)/1000000);
 
 	// Initialize the interface
 	ssd1306_interface_init();
@@ -158,9 +166,6 @@ void ssd1306_init(void)
 	port_pin_set_output_level(SSD1306_POWER_PIN, false);
 
 	ssd1306_display_on();
-
-	// Do a hard reset of the OLED display controller
-	ssd1306_clear_screen();
 }
 
 void ssd1306_clear_screen(void)
@@ -255,10 +260,17 @@ void ssd1306_display_on(void)
 	// Set the power pin to the default state
 	port_pin_set_output_level(SSD1306_POWER_PIN, true);
 
-    tc_start_counter(&extcom_tc_instance);
+    delay_cycles(delay_50uS);
+
+	ssd1306_clear_screen();
 
 	// Set the display enable pin to the default state
 	port_pin_set_output_level(SSD1306_DISPEN_PIN, true);
+
+    tc_set_count_value(&extcom_tc_instance, 0);
+    tc_start_counter(&extcom_tc_instance);
+
+    delay_cycles(delay_50uS);
 }
 
 /**
@@ -272,6 +284,8 @@ void ssd1306_display_off(void)
     port_pin_set_output_level(SSD1306_DISPEN_PIN, false);
 
     tc_stop_counter(&extcom_tc_instance);
+
+    delay_cycles(delay_50uS);
 
 	// Set the power pin to the default state
 	port_pin_set_output_level(SSD1306_POWER_PIN, false);
