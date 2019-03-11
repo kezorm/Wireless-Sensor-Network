@@ -80,6 +80,7 @@
  #include "config/timer.h"
  #include "config/console.h"
  #include "rtc.h"
+ #include "adc.h"
  
  #include "gfx_mono.h"
  #include "gfx_mono_text.h"
@@ -150,6 +151,25 @@ static void configure_wdt(void)
 	//! [setup_6]
 }
 
+struct adc_module adc_instance;
+
+static void configure_adc(void)
+{
+    struct adc_config config_adc;
+    
+    adc_get_config_defaults(&config_adc);
+    
+    config_adc.clock_source = GCLK_GENERATOR_1;
+    config_adc.reference = ADC_REFERENCE_INTVCC2;
+    config_adc.clock_prescaler = ADC_CLOCK_PRESCALER_DIV2;
+    config_adc.resolution = ADC_RESOLUTION_12BIT;
+    config_adc.negative_input = ADC_NEGATIVE_INPUT_GND;
+    config_adc.positive_input = ADC_POSITIVE_INPUT_BANDGAP;
+    
+    adc_init(&adc_instance, ADC, &config_adc);
+    system_voltage_reference_enable(SYSTEM_VOLTAGE_REFERENCE_OUTPUT);
+}
+
 static void print_reset_causes(void)
 {
 	enum system_reset_cause rcause = system_get_reset_cause();
@@ -212,6 +232,8 @@ int main(void)
 	configure_tc();
 	// RTC Init for wake up from Backup Sleep Mode
 	rtc_init();
+
+    configure_adc();
 
     gfx_mono_init();
 
@@ -288,7 +310,7 @@ int main(void)
 		#if defined(ED)
             draw_wireless_symbol();
             gfx_mono_put_framebuffer();
-
+            
 			MiApp_FlushTx();
 			// Tx Buffer User Data
 			MiApp_WriteData(NodeID);
@@ -298,9 +320,23 @@ int main(void)
 			//This function unicasts a message in the TxBuffer to the first connected peer device
 			// indexed at 0 in connection table
 			MiApp_BroadcastPacket(true); // Send Packet to Parent Device
+
 			delay_ms(50);
 
+            uint16_t adc_result;
+            adc_enable(&adc_instance);
+			delay_ms(1);
+            adc_start_conversion(&adc_instance);
+            while(adc_read(&adc_instance, &adc_result) == STATUS_BUSY);
+            adc_disable(&adc_instance);
+
             clear_wireless_symbol();
+
+            gfx_mono_draw_filled_rect(0, 113, 128, 12, GFX_PIXEL_CLR);
+            double vbattery = (1.0 * 4096 / adc_result);
+            char vbattery_string[10];
+            sprintf(vbattery_string, "Vbatt=%1.3fV", vbattery );
+            gfx_mono_draw_string(vbattery_string, 13,113,&sysfont);
 
             gfx_mono_draw_filled_rect(0, 28, 128, 71, GFX_PIXEL_CLR);
             gfx_mono_draw_char('0'+(temperature/10), 10, 28, &noto_sans_mono_blk_52x71);

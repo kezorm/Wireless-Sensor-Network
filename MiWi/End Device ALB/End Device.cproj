@@ -32,13 +32,14 @@
       <framework-data>
         <options>
           <option id="common.boards" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="common2.services.gfx_mono" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="common2.services.gfx_mono.font" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam0.components.sensor.at30tse75x" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam0.drivers.port" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam0.drivers.rtc" value="Add" config="count_callback" content-id="Atmel.ASF" />
           <option id="sam0.drivers.wdt" value="Add" config="callback" content-id="Atmel.ASF" />
           <option id="thirdparty.wireless.addons.sio2host" value="Add" config="uart" content-id="Atmel.ASF" />
-          <option id="common2.services.gfx_mono" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="common2.services.gfx_mono.font" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam0.drivers.adc" value="Add" config="polled" content-id="Atmel.ASF" />
           <option id="thirdparty.wireless.miwi" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.utils" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam0.utils.cmsis.samr30.source.template" value="Add" config="" content-id="Atmel.ASF" />
@@ -296,6 +297,9 @@
           <file path="src/ASF/common2/services/gfx_mono/tools/bitmap.py" framework="" version="3.35.1" source="common2\services\gfx_mono\tools\bitmap.py" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/common2/services/gfx_mono/gfx_mono_ug_2832hsweg04.c" framework="" version="3.35.1" source="common2\services\gfx_mono\gfx_mono_ug_2832hsweg04.c" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/common2/services/gfx_mono/gfx_mono_ug_2832hsweg04.h" framework="" version="3.35.1" source="common2\services\gfx_mono\gfx_mono_ug_2832hsweg04.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam0/drivers/adc/adc.h" framework="" version="3.35.1" source="sam0\drivers\adc\adc.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam0/drivers/adc/adc_sam_l_c/adc.c" framework="" version="3.35.1" source="sam0\drivers\adc\adc_sam_l_c\adc.c" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam0/drivers/adc/adc_sam_l_c/adc_feature.h" framework="" version="3.35.1" source="sam0\drivers\adc\adc_sam_l_c\adc_feature.h" changed="False" content-id="Atmel.ASF" />
         </files>
         <documentation help="http://asf.atmel.com/docs/3.44.0/thirdparty.wireless.miwi.apps.chat_demo.samr30_module_xplained_pro/html/index.html" />
         <offline-documentation help="" />
@@ -349,6 +353,7 @@
       <Value>RTC_COUNT_ASYNC=true</Value>
       <Value>I2C_MASTER_CALLBACK_MODE=false</Value>
       <Value>GFX_MONO_UG_2832HSWEG04=1</Value>
+      <Value>ADC_CALLBACK_MODE=false</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -408,6 +413,8 @@
       <Value>../src/ASF/sam0/drivers/rtc/rtc_sam_l_c</Value>
       <Value>../src/ASF/common2/components/display/ssd1306</Value>
       <Value>../src/ASF/common2/services/gfx_mono</Value>
+      <Value>../src/ASF/sam0/drivers/adc</Value>
+      <Value>../src/ASF/sam0/drivers/adc/adc_sam_l_c</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize most (-O3)</armgcc.compiler.optimization.level>
@@ -488,9 +495,11 @@
       <Value>../src/ASF/sam0/drivers/rtc/rtc_sam_l_c</Value>
       <Value>../src/ASF/common2/components/display/ssd1306</Value>
       <Value>../src/ASF/common2/services/gfx_mono</Value>
+      <Value>../src/ASF/sam0/drivers/adc</Value>
+      <Value>../src/ASF/sam0/drivers/adc/adc_sam_l_c</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
-  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=SAMR30_MODULE_XPLAINED_PRO -DUSART_CALLBACK_MODE=true -D__SAMR30E18A__ -DSYSTICK_MODE -DEXTINT_CALLBACK_MODE=true -DSPI_CALLBACK_MODE=false -DTC_ASYNC=true -DPROTOCOL_P2P -DPHY_AT86RF212B -DSAL_TYPE=AT86RF2xx -DWDT_CALLBACK_MODE=true -DRTC_COUNT_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=false -DGFX_MONO_UG_2832HSWEG04=1</armgcc.preprocessingassembler.general.AssemblerFlags>
+  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=SAMR30_MODULE_XPLAINED_PRO -DUSART_CALLBACK_MODE=true -D__SAMR30E18A__ -DSYSTICK_MODE -DEXTINT_CALLBACK_MODE=true -DSPI_CALLBACK_MODE=false -DTC_ASYNC=true -DPROTOCOL_P2P -DPHY_AT86RF212B -DSAL_TYPE=AT86RF2xx -DWDT_CALLBACK_MODE=true -DRTC_COUNT_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=false -DGFX_MONO_UG_2832HSWEG04=1 -DADC_CALLBACK_MODE=false</armgcc.preprocessingassembler.general.AssemblerFlags>
   <armgcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
       <Value>../src/ASF/sam0/boards/samr30_module_xplained_pro</Value>
@@ -548,6 +557,8 @@
       <Value>../src/ASF/sam0/drivers/rtc/rtc_sam_l_c</Value>
       <Value>../src/ASF/common2/components/display/ssd1306</Value>
       <Value>../src/ASF/common2/services/gfx_mono</Value>
+      <Value>../src/ASF/sam0/drivers/adc</Value>
+      <Value>../src/ASF/sam0/drivers/adc/adc_sam_l_c</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -579,6 +590,7 @@
       <Value>RTC_COUNT_ASYNC=true</Value>
       <Value>WDT_CALLBACK_MODE=true</Value>
       <Value>GFX_MONO_UG_2832HSWEG04=1</Value>
+      <Value>ADC_CALLBACK_MODE=false</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -642,6 +654,8 @@
       <Value>../src/ASF/sam0/drivers/rtc/rtc_sam_l_c</Value>
       <Value>../src/ASF/common2/components/display/ssd1306</Value>
       <Value>../src/ASF/common2/services/gfx_mono</Value>
+      <Value>../src/ASF/sam0/drivers/adc</Value>
+      <Value>../src/ASF/sam0/drivers/adc/adc_sam_l_c</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -650,7 +664,6 @@
   <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
   <armgcc.compiler.miscellaneous.OtherFlags>-pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500</armgcc.compiler.miscellaneous.OtherFlags>
-  <armgcc.linker.general.UseNewlibNano>True</armgcc.linker.general.UseNewlibNano>
   <armgcc.linker.libraries.Libraries>
     <ListValues>
       <Value>libsam0_lib_hw_timer</Value>
@@ -724,10 +737,12 @@
       <Value>../src/ASF/sam0/drivers/rtc/rtc_sam_l_c</Value>
       <Value>../src/ASF/common2/components/display/ssd1306</Value>
       <Value>../src/ASF/common2/services/gfx_mono</Value>
+      <Value>../src/ASF/sam0/drivers/adc</Value>
+      <Value>../src/ASF/sam0/drivers/adc/adc_sam_l_c</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
-  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=SAMR30_MODULE_XPLAINED_PRO -DUSART_CALLBACK_MODE=true -D__SAMR30E18A__ -DSYSTICK_MODE -DEXTINT_CALLBACK_MODE=true -DSPI_CALLBACK_MODE=false -DTC_ASYNC=true -DPROTOCOL_P2P -DPHY_AT86RF212B -DSAL_TYPE=AT86RF2xx -DWDT_CALLBACK_MODE=true -DRTC_COUNT_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=false -DGFX_MONO_UG_2832HSWEG04=1</armgcc.preprocessingassembler.general.AssemblerFlags>
+  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=SAMR30_MODULE_XPLAINED_PRO -DUSART_CALLBACK_MODE=true -D__SAMR30E18A__ -DSYSTICK_MODE -DEXTINT_CALLBACK_MODE=true -DSPI_CALLBACK_MODE=false -DTC_ASYNC=true -DPROTOCOL_P2P -DPHY_AT86RF212B -DSAL_TYPE=AT86RF2xx -DWDT_CALLBACK_MODE=true -DRTC_COUNT_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=false -DGFX_MONO_UG_2832HSWEG04=1 -DADC_CALLBACK_MODE=false</armgcc.preprocessingassembler.general.AssemblerFlags>
   <armgcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
       <Value>../src/ASF/sam0/boards/samr30_module_xplained_pro</Value>
@@ -785,6 +800,8 @@
       <Value>../src/ASF/sam0/drivers/rtc/rtc_sam_l_c</Value>
       <Value>../src/ASF/common2/components/display/ssd1306</Value>
       <Value>../src/ASF/common2/services/gfx_mono</Value>
+      <Value>../src/ASF/sam0/drivers/adc</Value>
+      <Value>../src/ASF/sam0/drivers/adc/adc_sam_l_c</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -819,6 +836,8 @@
     <Folder Include="src\ASF\sam0\components\sensor\at30tse75x\" />
     <Folder Include="src\ASF\sam0\components\sensor\at30tse75x\quick_start\" />
     <Folder Include="src\ASF\sam0\drivers\" />
+    <Folder Include="src\ASF\sam0\drivers\adc\" />
+    <Folder Include="src\ASF\sam0\drivers\adc\adc_sam_l_c\" />
     <Folder Include="src\ASF\sam0\drivers\extint\" />
     <Folder Include="src\ASF\sam0\drivers\extint\extint_sam_l_c\" />
     <Folder Include="src\ASF\sam0\drivers\nvm\" />
@@ -962,6 +981,15 @@
       <SubType>compile</SubType>
     </Compile>
     <None Include="src\ASF\common2\services\gfx_mono\sysfont.h">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\ASF\sam0\drivers\adc\adc.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam0\drivers\adc\adc_sam_l_c\adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam0\drivers\adc\adc_sam_l_c\adc_feature.h">
       <SubType>compile</SubType>
     </None>
     <Compile Include="src\ASF\sam0\drivers\rtc\rtc_sam_l_c\rtc_count.c">

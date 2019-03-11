@@ -754,7 +754,7 @@
 	};
 #elif defined(USE_FONT_MONO_MMM_10x12)
 /** Width of each glyph, including spacer column. */
-#  define SYSFONT_WIDTH           10
+#  define SYSFONT_WIDTH           9
 /** Height of each glyph, excluding spacer line. */
 #  define SYSFONT_HEIGHT          12
 /** Line height. */
