@@ -122,6 +122,7 @@ static void ssd1306_interface_init(void)
     config_tc.counter_size = TC_COUNTER_SIZE_16BIT;
     config_tc.clock_source = GCLK_GENERATOR_1;
     config_tc.clock_prescaler = TC_CLOCK_PRESCALER_DIV1;
+    config_tc.run_in_standby = true;
 
     config_tc.wave_generation = TC_WAVE_GENERATION_MATCH_FREQ;
     

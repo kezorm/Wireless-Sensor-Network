@@ -80,6 +80,11 @@
  #include "config/timer.h"
  #include "config/console.h"
  #include "rtc.h"
+ 
+ #include "gfx_mono.h"
+ #include "gfx_mono_text.h"
+ #include "gfx_mono_generic.h"
+ #include "noto_sans_mono_blk_52x71.h"
 
 
 const uint8_t MiWi_Data[6][21] =
@@ -177,6 +182,23 @@ void toggleLED(uint8_t val){
 		delay_ms(100);
 	}
 }
+
+void draw_wireless_symbol(void)
+{
+    gfx_mono_generic_draw_filled_circle(112,15,2,GFX_PIXEL_SET,GFX_QUADRANT0);
+    gfx_mono_generic_draw_circle(112,15,4,GFX_PIXEL_SET,GFX_QUADRANT0);
+    gfx_mono_generic_draw_circle(112,15,5,GFX_PIXEL_SET,GFX_QUADRANT0);
+    gfx_mono_generic_draw_circle(112,15,7,GFX_PIXEL_SET,GFX_QUADRANT0);
+    gfx_mono_generic_draw_circle(112,15,8,GFX_PIXEL_SET,GFX_QUADRANT0);
+    gfx_mono_generic_draw_circle(112,15,10,GFX_PIXEL_SET,GFX_QUADRANT0);
+    gfx_mono_generic_draw_circle(112,15,11,GFX_PIXEL_SET,GFX_QUADRANT0);
+}
+
+void clear_wireless_symbol(void)
+{
+    gfx_mono_draw_filled_rect(112,3,13,13,GFX_PIXEL_CLR);
+}
+
 int main(void)
 {	
 	uint8_t i , button_press;
@@ -193,7 +215,6 @@ int main(void)
 
     gfx_mono_init();
 
-    gfx_mono_generic_draw_filled_circle( 64, 64, 40, GFX_PIXEL_SET, GFX_WHOLE);
     
 	/*******************************************************************/
 	// Initialize Microchip proprietary protocol. Which protocol to use
@@ -265,21 +286,32 @@ int main(void)
 
 		}
 		#if defined(ED)
+            draw_wireless_symbol();
+            gfx_mono_put_framebuffer();
+
 			MiApp_FlushTx();
 			// Tx Buffer User Data
 			MiApp_WriteData(NodeID);
-			MiApp_WriteData( at30tse_read_temperature()*1.8+32);
+            
+            uint8_t temperature = (uint8_t)( at30tse_read_temperature()*1.8+32);
+			MiApp_WriteData(temperature);
 			//This function unicasts a message in the TxBuffer to the first connected peer device
 			// indexed at 0 in connection table
 			MiApp_BroadcastPacket(true); // Send Packet to Parent Device
 			delay_ms(50);
 
+            clear_wireless_symbol();
+
+            gfx_mono_draw_filled_rect(0, 28, 128, 71, GFX_PIXEL_CLR);
+            gfx_mono_draw_char('0'+(temperature/10), 10, 28, &noto_sans_mono_blk_52x71);
+            gfx_mono_draw_char('0'+(temperature%10), 66, 28, &noto_sans_mono_blk_52x71);
             gfx_mono_put_framebuffer();
 
 			PHY_Sleep();
 //            ssd1306_display_off();
+            at30tse_write_config_register(0x8100);
 			LED_Off(LED0);
-			setSleepPeriod(1); // 65 = 16 min
+			setSleepPeriod(2); // 65 = 16 min
 			LED_On(LED0);
 //            ssd1306_display_on();
             PHY_Wakeup();

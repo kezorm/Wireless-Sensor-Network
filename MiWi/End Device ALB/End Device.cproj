@@ -994,6 +994,12 @@
     <Compile Include="src\config\console.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\noto_sans_mono_blk_52x71.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\noto_sans_mono_blk_52x71.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\timer.c">
       <SubType>compile</SubType>
     </Compile>

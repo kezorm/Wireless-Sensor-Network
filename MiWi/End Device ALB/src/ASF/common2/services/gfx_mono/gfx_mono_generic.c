@@ -104,7 +104,7 @@ void gfx_mono_generic_draw_horizontal_line(gfx_coord_t x, gfx_coord_t y,
 			x1byte += 8;
 		}
 
-		gfx_mono_mask_byte(x2, x, x2pixelmask, color);
+		gfx_mono_mask_byte(x2, y, x2pixelmask, color);
 	}
 }
 
