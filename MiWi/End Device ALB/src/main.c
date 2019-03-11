@@ -339,6 +339,10 @@ int main(void)
             gfx_mono_draw_string(vbattery_string, 13,113,&sysfont);
 
             gfx_mono_draw_filled_rect(0, 28, 128, 71, GFX_PIXEL_CLR);
+            if( temperature >= 100 )
+            {
+                temperature = temperature - 100;
+            }
             gfx_mono_draw_char('0'+(temperature/10), 10, 28, &noto_sans_mono_blk_52x71);
             gfx_mono_draw_char('0'+(temperature%10), 66, 28, &noto_sans_mono_blk_52x71);
             gfx_mono_put_framebuffer();
